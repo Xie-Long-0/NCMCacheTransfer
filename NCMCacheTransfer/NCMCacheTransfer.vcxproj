@@ -95,12 +95,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="ReadMe.md" />
     <QtRcc Include="MainWidget.qrc" />
     <QtUic Include="MainWidget.ui" />
     <QtMoc Include="MainWidget.h" />
     <ClCompile Include="MainWidget.cpp" />
     <ClCompile Include="main.cpp" />
+    <None Include="..\ReadMe.md" />
     <None Include="cpp.hint" />
     <None Include="NCMCacheTransfer.ico" />
     <ResourceCompile Include="NCMCacheTransfer.rc" />

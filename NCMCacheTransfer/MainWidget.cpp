@@ -68,7 +68,8 @@ void MainWidget::dragEnterEvent(QDragEnterEvent *e)
     auto mime = e->mimeData();
     if (ui.fileLineEdit->geometry().contains(e->pos()) && mime->hasUrls())
     {
-        if (mime->urls()[0].fileName().last(3) == ".uc")
+        auto fn = mime->urls()[0].fileName();
+        if (fn.last(3) == ".uc" || fn.last(4) == ".uc!")
             e->acceptProposedAction();
     }
 }
@@ -83,7 +84,7 @@ void MainWidget::dropEvent(QDropEvent * e)
 void MainWidget::onFileDialogBtnClick()
 {
     QString file_name = QFileDialog::getOpenFileName(this, tr("选择缓存文件"),
-        QStandardPaths::writableLocation(QStandardPaths::MusicLocation), "MCN Cache Files(*.uc)");
+        QStandardPaths::writableLocation(QStandardPaths::MusicLocation), "MCN Cache Files (*.uc *.uc!)");
 
     if (file_name.isEmpty())
         return;
@@ -105,7 +106,7 @@ void MainWidget::onTransferBtnClick()
 
     // 创建临时文件
     m_file->setFileName(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/tmp.music");
-    if (!m_file->open(QIODevice::ReadWrite))
+    if (!m_file->open(QIODevice::WriteOnly))
     {
         file_in->deleteLater();
         QMessageBox::critical(this, tr("错误"), tr("临时文件创建失败！"));

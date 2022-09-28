@@ -49,6 +49,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
-    <None Include="ReadMe.md" />
+    <None Include="..\ReadMe.md" />
   </ItemGroup>
 </Project>
