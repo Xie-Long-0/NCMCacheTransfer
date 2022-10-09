@@ -15,7 +15,7 @@ env:
   # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
   BUILD_CONFIGURATION: Release
   
-  #QT_DIR: $GITHUB_WORKSPACE/Qt/6.2.4/win64_msvc2019_64/bin
+  QtToolsPath: $GITHUB_WORKSPACE/Qt/6.2.4/win64_msvc2019_64/bin
 
 permissions:
   contents: read
