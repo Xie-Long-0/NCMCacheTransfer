@@ -21,17 +21,45 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    strategy:
+      # 矩阵配置
+      matrix:
+        qt_ver: [6.2.4]
+        qt_target: [desktop]
+        qt_arch: [win64_msvc2019_64]
+        # 额外设置msvc_arch
+        include:
+        - qt_arch: win64_msvc2019_64
+          msvc_arch: x64
+          qt_path: msvc2019_64
 
     steps:
+    # Cache Qt
+    - name: Cache Qt
+      id: cacheqt6
+      uses: actions/cache@v3.0.10
+      with:
+        # A list of files, directories, and wildcard patterns to cache and restore
+        path: ../Qt/${{matrix.qt_var}}/${{matrix.qt_arch}}
+        key: qt6
+    
+    # Setup Qt
+    - name: Setup Qt
+      if: steps.cacheqt6.outputs.cache-hit == 'true'
+      shell: pwsh
+      env:
+        QT_PATH: ../Qt/${{matrix.qt_var}}/${{matrix.qt_arch}}
+    
     # install Qt
     - name: Install Qt
+      if: steps.cacheqt6.outputs.cache-hit != 'true'
       uses: jurplel/install-qt-action@v3
       with:
         aqtversion: '==2.1.*'
-        version: '6.2.4'
+        version: ${{ matrix.qt_ver }}
         host: 'windows'
-        target: 'desktop'
-        arch: 'win64_msvc2019_64'
+        target: ${{ matrix.qt_target }}
+        arch: ${{ matrix.qt_arch }}
         modules: 'qtmultimedia'
         tools: 'tools_cmake tools_ninja'
         setup-python: 'false'
@@ -45,6 +73,6 @@ jobs:
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       env:
-        QtToolsPath: ${{env.GITHUB_WORKSPACE}}/Qt/6.2.4/win64_msvc2019_64/bin
+        QtToolsPath: ../Qt/${{matrix.qt_var}}/${{matrix.qt_arch}}/bin
         
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
