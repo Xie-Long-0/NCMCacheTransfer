@@ -40,22 +40,22 @@ jobs:
       uses: actions/cache@v3.0.10
       with:
         # A list of files, directories, and wildcard patterns to cache and restore
-        path: ${{env.GITHUB_WORKSPACE}}/Qt/${{matrix.qt_ver}}/${{matrix.qt_path}}
-        key: qt6
+        path: $GITHUB_WORKSPACE/Qt/${{matrix.qt_ver}}/${{matrix.qt_path}}
+        key: win-qt6
     
     # Print env
     - name: Echo env
       shell: pwsh
       run: |
-        echo "env $env"
-        echo "${{env.GITHUB_WORKSPACE}}"
+        echo "$GITHUB_WORKSPACE"
+        echo "$RUNNER_WORKSPACE"
     
     # Setup Qt
     - name: Setup Qt
       if: steps.cacheqt6.outputs.cache-hit == 'true'
       shell: pwsh
       env:
-        QT_PATH: ${{env.GITHUB_WORKSPACE}}/Qt/${{matrix.qt_ver}}/${{matrix.qt_path}}
+        QT_PATH: $GITHUB_WORKSPACE/Qt/${{matrix.qt_ver}}/${{matrix.qt_path}}
       run: |
         $qtpath=${env:QT_PATH}
         echo "::set-env name=Qt6_DIR::$qtpath"
@@ -84,6 +84,6 @@ jobs:
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       env:
-        QtToolsPath: ${{env.GITHUB_WORKSPACE}}/Qt/${{matrix.qt_ver}}/${{matrix.qt_path}}/bin
+        QtToolsPath: $GITHUB_WORKSPACE/Qt/${{matrix.qt_ver}}/${{matrix.qt_path}}/bin
         
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
