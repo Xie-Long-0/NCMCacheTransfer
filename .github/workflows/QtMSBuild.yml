@@ -22,12 +22,12 @@ jobs:
   build:
     runs-on: windows-latest
     strategy:
-      # 矩阵配置
+      # 配置
       matrix:
         qt_ver: [6.2.4]
         qt_target: [desktop]
         qt_arch: [win64_msvc2019_64]
-        # 额外设置msvc_arch
+        # 额外选项
         include:
         - qt_arch: win64_msvc2019_64
           msvc_arch: x64
@@ -42,15 +42,7 @@ jobs:
         # A list of files, directories, and wildcard patterns to cache and restore
         path: ${{runner.workspace}}/Qt/${{matrix.qt_ver}}/${{matrix.qt_path}}
         key: win-qt6
-    
-    # Print env
-    - name: Echo env
-      shell: pwsh
-      run: |
-        echo "${{github.workspace}}"
-        echo "${RUNNER_WORKSPACE}"
-        echo "${{runner.workspace}}"
-    
+
     # Setup Qt
     - name: Setup Qt
       if: steps.cacheqt6.outputs.cache-hit == 'true'
@@ -59,9 +51,11 @@ jobs:
         QT_PATH: ${{runner.workspace}}/Qt/${{matrix.qt_ver}}/${{matrix.qt_path}}
       run: |
         $qtpath=${env:QT_PATH}
-        echo "::set-env name=Qt6_DIR::$qtpath"
-        echo "::add-path::$qtpath/bin"
-    
+        echo "{Qt6_DIR}={$qtpath}" >> $GITHUB_ENV
+        echo "{QT_PLUGIN_PATH}={$qtpath/plugins}" >> $GITHUB_ENV
+        echo "{IQTA_TOOLS}={${{runner.workspace}}/Qt/Tools}" >> $GITHUB_ENV
+        echo "{$qtpath/bin}" >> $GITHUB_PATH
+
     # install Qt
     - name: Install Qt
       if: steps.cacheqt6.outputs.cache-hit != 'true'
@@ -75,7 +69,7 @@ jobs:
         modules: 'qtmultimedia'
         tools: 'tools_cmake tools_ninja'
         setup-python: 'false'
-    
+
     # Pull code
     - uses: actions/checkout@v3
 
@@ -86,5 +80,5 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       env:
         QtToolsPath: ${{runner.workspace}}/Qt/${{matrix.qt_ver}}/${{matrix.qt_path}}/bin
-        
+
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
